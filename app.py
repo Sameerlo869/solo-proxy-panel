@@ -102,8 +102,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return redirect('/')
+
     try:
         db = {}
         try:
@@ -514,8 +517,11 @@ def login_required(f):
 
 # --- AUTH ROUTES ---
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return redirect('/')
+
     try:
         db = {}
         try:
