@@ -50,7 +50,7 @@ class GistDB:
         except Exception: pass
         
         try:
-            with open(BACKUP_FILE, 'r') as f: return json.load(f)
+            pass
         except: return dict(DEFAULT_DB)
 
     @classmethod
@@ -58,7 +58,7 @@ class GistDB:
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f)
         try:
-    pass
+            pass
 # [Auto-Cleaned CSS]             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
 # [Auto-Cleaned CSS]                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
@@ -69,7 +69,7 @@ def enc_token(txt):
     
 def dec_token(txt): 
     try: return cipher.decrypt(txt.encode()).decode() if txt else ""
-    except: return ""
+        pass
 
 def now_ts(): return int(time.time())
 def fmt_time(ts): return datetime.fromtimestamp(ts).strftime('%d %b %Y %H:%M:%S')
