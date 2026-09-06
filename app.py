@@ -61,15 +61,16 @@ class GistDB:
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f)
         try:
-            pass
+            requests.patch(
+                GIST_URL,
+                headers={"Authorization": f"token {GIST_TOKEN}"},
+                json={"files": {"db.json": {"content": json.dumps(data)}}},
+                timeout=5
+            )
         except Exception:
             pass
-            pass
-             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
-                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
-        except Exception: pass
 
-# --- HELPER FUNCTIONS ---
+        # --- HELPER FUNCTIONS ---
 def enc_token(txt): 
     return cipher.encrypt(txt.encode()).decode() if txt else ""
     
@@ -454,11 +455,11 @@ HTML = '''<!DOCTYPE html>
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f) # Backup pehle
         try:
-                 requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
-                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
+    requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
+        json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
 
-# --- HELPER FUNCTIONS ---
+        # --- HELPER FUNCTIONS ---
 def enc_token(txt): 
     # Token ko encrypt karne ke liye
     return cipher.encrypt(txt.encode()).decode() if txt else ""
