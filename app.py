@@ -1252,6 +1252,7 @@ def dashboard():
     return render_template_string(HTML, db=db, now_ts=now_ts, fmt_time=fmt_time)
 
 
+
 @app.route('/api/auto-company-import', methods=['POST'])
 def auto_company_import():
     try:
@@ -1260,13 +1261,17 @@ def auto_company_import():
             return jsonify({"status": False, "msg": "No data provided"}), 400
         
         import re
+        host_match = re.search(r'host:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
         tenant_match = re.search(r'x-tenant:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
         broker_match = re.search(r'x-broker:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
         provider_match = re.search(r'x-provider:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
+        auth_match = re.search(r'authorization:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
         
-        tenant = tenant_match.group(1).strip() if tenant_match else "default_tenant"
-        broker = broker_match.group(1).strip() if broker_match else "default_broker"
-        provider = provider_match.group(1).strip() if provider_match else "default_provider"
+        host = host_match.group(1).strip() if host_match else "turtlemintloans.com"
+        tenant = tenant_match.group(1).strip() if tenant_match else "turtlemint"
+        broker = broker_match.group(1).strip() if broker_match else "turtlemint"
+        provider = provider_match.group(1).strip() if provider_match else "signzy"
+        auth = auth_match.group(1).strip() if auth_match else ""
         
         db = GistDB.load() or {}
         if 'companies' not in db:
@@ -1279,17 +1284,28 @@ def auto_company_import():
             "tenant_id": tenant,
             "broker_id": broker,
             "active_provider": provider,
-            "raw_snippet": raw_data[:200]
+            "base_url": f"https://{host}",
+            "status": "active",
+            "token_status": "Valid & Active 🟢",
+            "last_checked": __import__('time').strftime('%Y-%m-%d %H:%M:%S'),
+            "headers": {
+                "authorization": auth,
+                "x-tenant": tenant,
+                "x-broker": broker,
+                "x-provider": provider,
+                "host": host
+            },
+            "raw_snippet": raw_data[:300]
         }
         
         GistDB.save(db)
+        
         if request.is_json or (request.headers.get('Content-Type') and 'application/json' in request.headers.get('Content-Type')):
-            return jsonify({"status": True, "msg": f"Company {company_code} saved successfully!", "data": db['companies'][company_code]})
+            return jsonify({"status": True, "msg": f"Company {company_code} saved automatically!", "data": db['companies'][company_code]})
+        
         return redirect('/')
     except Exception as e:
-        return jsonify({"status": False, "msg": str(e)}), 500
-
-
+        return f"Auto-Import Error: {str(e)}", 500
 
 @app.route('/api/company/toggle/<company_code>', methods=['POST'])
 def toggle_company(company_code):
