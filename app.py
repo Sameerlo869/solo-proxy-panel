@@ -44,7 +44,7 @@ class GistDB:
         except Exception:
             pass
             pass
-             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
+            r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
             if r.status_code == 200:
                 cls._cache = json.loads(r.json()['files']['db.json']['content'])
                 cls._ts = time.time()
