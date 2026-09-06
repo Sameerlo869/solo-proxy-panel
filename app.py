@@ -40,6 +40,7 @@ class GistDB:
     def load(cls):
         if cls._cache and (time.time() - cls._ts < 5): return cls._cache
         try:
+    pass
 # [Auto-Cleaned CSS]             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
             if r.status_code == 200:
                 cls._cache = json.loads(r.json()['files']['db.json']['content'])
@@ -57,6 +58,7 @@ class GistDB:
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f)
         try:
+    pass
 # [Auto-Cleaned CSS]             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
 # [Auto-Cleaned CSS]                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
