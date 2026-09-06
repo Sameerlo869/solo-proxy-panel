@@ -1,0 +1,34 @@
+Vercel CLI 59.11.7 (Node.js 24.18.0)
+Deploying solo-proxy-panel
+  Inspect         https://vercel.com/dark-api7-onion/solo-proxy-panel/Bqvvm5qfP2eiPsauLuZbRHVYvsWo
+  Production      https://solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.app
+https://solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.appBuilding…
+Building…
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 2 cores, 8 GB
+Retrieving list of deployment files...
+Downloading 54 deployment files...
+Restored build cache from previous deployment (2JKvmFxbxU4SSuXeMRLxJXFq11s1)
+Running "vercel build"
+Vercel CLI 59.11.7
+WARNING! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+No Python version specified in .python-version, pyproject.toml, or Pipfile.lock. Using python version: 3.12
+Using uv 0.10.11
+Installing required dependencies from requirements.txt...
+Compiling Python bytecode...
+Build Completed in /vercel/output [3s]
+Deploying outputs...
+[2K[1A[2K[G  Production      https://solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.app
+Completing…
+▲ Aliased         https://solo-proxy-panel.vercel.app
+
+✓ Ready in 16s
+Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+
+Next steps:
+- Check the deployment response:
+  vercel curl https://solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.app
+- View build logs:
+  vercel inspect solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.app --logs
+- Create a new deployment from the same source:
+  vercel redeploy solo-proxy-panel-1zs5aemon-dark-api7-onion.vercel.app

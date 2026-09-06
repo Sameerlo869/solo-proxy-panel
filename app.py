@@ -348,32 +348,32 @@ HTML = '''<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{--bg:#0b0c10;--glass:rgba(31,40,51,0.6);--border:rgba(69,162,158,0.3);--neon:#66fcf1;--neon-dim:#45a29e;}
-body{background:var(--bg);color:#c5c6c7;font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;}
-::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
-.glass{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
-.sidebar{width:260px;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
-.logo{font-size:24px;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:20px;font-weight:bold;text-align:center;}
-.nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
-.nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
-.main{flex:1;padding:25px;overflow-y:auto;position:relative;}
+# [Naked CSS Nuked] body{background:var(--bg);color:#c5c6c7;font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;}
+# [Naked CSS Nuked] ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
+# [Naked CSS Nuked] .glass{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+# [Naked CSS Nuked] .sidebar{width:260px;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
+# [Naked CSS Nuked] .logo{font-size:24px;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:20px;font-weight:bold;text-align:center;}
+# [Naked CSS Nuked] .nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
+# [Naked CSS Nuked] .nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
+# [Naked CSS Nuked] .main{flex:1;padding:25px;overflow-y:auto;position:relative;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
-.clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
+# [Naked CSS Nuked] .clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
 .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
-.card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
+# [Naked CSS Nuked] .card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
 .tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
 @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
-.green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
+# [Naked CSS Nuked] .health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
+# [Naked CSS Nuked] .green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
 @keyframes pulse{0%{transform:scale(0.95);opacity:0.8}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0.95);opacity:0.8}}
-.table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;} .table th,.table td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);}
-.btn{padding:8px 15px;border:none;border-radius:6px;cursor:pointer;color:#0b0c10;font-weight:bold;background:var(--neon);transition:0.3s;text-decoration:none;display:inline-block;}
-.btn:hover{box-shadow:0 0 12px var(--neon);} .btn-danger{background:rgba(217,83,79,0.2);color:#d9534f;border:1px solid #d9534f;} .btn-danger:hover{box-shadow:0 0 12px #d9534f;background:#d9534f;color:#fff;}
-input, select, textarea{width:100%;padding:10px;margin:8px 0 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:#fff;border-radius:6px;outline:none;}
-input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102,252,241,0.4);}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;justify-content:center;align-items:center;}
+# [Naked CSS Nuked] .table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;} .table th,.table td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);}
+# [Naked CSS Nuked] .btn{padding:8px 15px;border:none;border-radius:6px;cursor:pointer;color:#0b0c10;font-weight:bold;background:var(--neon);transition:0.3s;text-decoration:none;display:inline-block;}
+# [Naked CSS Nuked] .btn:hover{box-shadow:0 0 12px var(--neon);} .btn-danger{background:rgba(217,83,79,0.2);color:#d9534f;border:1px solid #d9534f;} .btn-danger:hover{box-shadow:0 0 12px #d9534f;background:#d9534f;color:#fff;}
+# [Naked CSS Nuked] input, select, textarea{width:100%;padding:10px;margin:8px 0 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:#fff;border-radius:6px;outline:none;}
+# [Naked CSS Nuked] input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102,252,241,0.4);}
+# [Naked CSS Nuked] .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;justify-content:center;align-items:center;}
 </style></head><body>
 {% if not session.admin_logged %}
-<div style="margin:auto;width:350px;text-align:center;" class="glass card">
+# [Naked CSS Nuked] <div style="margin:auto;width:350px;text-align:center;" class="glass card">
     <div class="logo"><i class="fa-solid fa-lock"></i> SYSTEM ADMIN</div>
     <form action="/login" method="POST">
         <input name="u" placeholder="Admin Username" required>
@@ -389,7 +389,7 @@ input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102
     <div class="nav-item" onclick="showTab('srvs', this)"><i class="fa-solid fa-satellite-dish"></i> Services</div>
     <div class="nav-item" onclick="showTab('keys', this)"><i class="fa-solid fa-key"></i> Key Manager</div>
     <div class="nav-item" onclick="showTab('logs', this)"><i class="fa-solid fa-terminal"></i> Live Audit</div>
-    <a href="/logout" class="nav-item" style="color:#d9534f;margin-top:auto;"><i class="fa-solid fa-power-off"></i> Disconnect</a>
+# [Naked CSS Nuked]     <a href="/logout" class="nav-item" style="color:#d9534f;margin-top:auto;"><i class="fa-solid fa-power-off"></i> Disconnect</a>
 </div>
 <div class="main">
     <div class="topbar">
@@ -399,12 +399,12 @@ input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102
     
     <div id="dash" class="tab active">
         <div class="grid-4">
-            <div class="card glass"><h4><i class="fa-solid fa-building"></i> Partners</h4><h2 style="color:var(--neon)">{{ db.get('companies',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-network-wired"></i> Gateways</h4><h2 style="color:var(--neon)">{{ db.get('services',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-users"></i> Issued Keys</h4><h2 style="color:var(--neon)">{{ db.get('keys',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-bolt"></i> Logs Triggered</h4><h2 style="color:var(--neon)">{{ db.get('logs',[])|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-building"></i> Partners</h4><h2 style="color:var(--neon)">{{ db.get('companies',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-network-wired"></i> Gateways</h4><h2 style="color:var(--neon)">{{ db.get('services',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-users"></i> Issued Keys</h4><h2 style="color:var(--neon)">{{ db.get('keys',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-bolt"></i> Logs Triggered</h4><h2 style="color:var(--neon)">{{ db.get('logs',[])|length }}</h2></div>
         </div>
-        <h3 style="margin-top:20px;margin-bottom:15px;color:var(--neon-dim)"><i class="fa-solid fa-heart-pulse"></i> Service Health Monitor</h3>
+# [Naked CSS Nuked]         <h3 style="margin-top:20px;margin-bottom:15px;color:var(--neon-dim)"><i class="fa-solid fa-heart-pulse"></i> Service Health Monitor</h3>
         <div class="grid-4">
     @classmethod
     def load(cls):
@@ -956,32 +956,32 @@ HTML = '''<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{--bg:#0b0c10;--glass:rgba(31,40,51,0.6);--border:rgba(69,162,158,0.3);--neon:#66fcf1;--neon-dim:#45a29e;}
-body{background:var(--bg);color:#c5c6c7;font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;}
-::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
-.glass{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
-.sidebar{width:260px;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
-.logo{font-size:24px;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:20px;font-weight:bold;text-align:center;}
-.nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
-.nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
-.main{flex:1;padding:25px;overflow-y:auto;position:relative;}
+# [Naked CSS Nuked] body{background:var(--bg);color:#c5c6c7;font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;}
+# [Naked CSS Nuked] ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
+# [Naked CSS Nuked] .glass{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+# [Naked CSS Nuked] .sidebar{width:260px;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
+# [Naked CSS Nuked] .logo{font-size:24px;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:20px;font-weight:bold;text-align:center;}
+# [Naked CSS Nuked] .nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
+# [Naked CSS Nuked] .nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
+# [Naked CSS Nuked] .main{flex:1;padding:25px;overflow-y:auto;position:relative;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
-.clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
+# [Naked CSS Nuked] .clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
 .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
-.card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
+# [Naked CSS Nuked] .card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
 .tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
 @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
-.green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
+# [Naked CSS Nuked] .health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
+# [Naked CSS Nuked] .green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
 @keyframes pulse{0%{transform:scale(0.95);opacity:0.8}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0.95);opacity:0.8}}
-.table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;} .table th,.table td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);}
-.btn{padding:8px 15px;border:none;border-radius:6px;cursor:pointer;color:#0b0c10;font-weight:bold;background:var(--neon);transition:0.3s;text-decoration:none;display:inline-block;}
-.btn:hover{box-shadow:0 0 12px var(--neon);} .btn-danger{background:rgba(217,83,79,0.2);color:#d9534f;border:1px solid #d9534f;} .btn-danger:hover{box-shadow:0 0 12px #d9534f;background:#d9534f;color:#fff;}
-input, select, textarea{width:100%;padding:10px;margin:8px 0 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:#fff;border-radius:6px;outline:none;}
-input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102,252,241,0.4);}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;justify-content:center;align-items:center;}
+# [Naked CSS Nuked] .table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;} .table th,.table td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);}
+# [Naked CSS Nuked] .btn{padding:8px 15px;border:none;border-radius:6px;cursor:pointer;color:#0b0c10;font-weight:bold;background:var(--neon);transition:0.3s;text-decoration:none;display:inline-block;}
+# [Naked CSS Nuked] .btn:hover{box-shadow:0 0 12px var(--neon);} .btn-danger{background:rgba(217,83,79,0.2);color:#d9534f;border:1px solid #d9534f;} .btn-danger:hover{box-shadow:0 0 12px #d9534f;background:#d9534f;color:#fff;}
+# [Naked CSS Nuked] input, select, textarea{width:100%;padding:10px;margin:8px 0 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:#fff;border-radius:6px;outline:none;}
+# [Naked CSS Nuked] input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102,252,241,0.4);}
+# [Naked CSS Nuked] .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;justify-content:center;align-items:center;}
 </style></head><body>
 {% if not session.admin_logged %}
-<div style="margin:auto;width:350px;text-align:center;" class="glass card">
+# [Naked CSS Nuked] <div style="margin:auto;width:350px;text-align:center;" class="glass card">
     <div class="logo"><i class="fa-solid fa-lock"></i> SYSTEM ADMIN</div>
     <form action="/login" method="POST">
         <input name="u" placeholder="Admin Username" required>
@@ -997,7 +997,7 @@ input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102
     <div class="nav-item" onclick="showTab('srvs', this)"><i class="fa-solid fa-satellite-dish"></i> Services</div>
     <div class="nav-item" onclick="showTab('keys', this)"><i class="fa-solid fa-key"></i> Key Manager</div>
     <div class="nav-item" onclick="showTab('logs', this)"><i class="fa-solid fa-terminal"></i> Live Audit</div>
-    <a href="/logout" class="nav-item" style="color:#d9534f;margin-top:auto;"><i class="fa-solid fa-power-off"></i> Disconnect</a>
+# [Naked CSS Nuked]     <a href="/logout" class="nav-item" style="color:#d9534f;margin-top:auto;"><i class="fa-solid fa-power-off"></i> Disconnect</a>
 </div>
 <div class="main">
     <div class="topbar">
@@ -1007,16 +1007,16 @@ input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102
     
     <div id="dash" class="tab active">
         <div class="grid-4">
-            <div class="card glass"><h4><i class="fa-solid fa-building"></i> Partners</h4><h2 style="color:var(--neon)">{{ db.get('companies',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-network-wired"></i> Gateways</h4><h2 style="color:var(--neon)">{{ db.get('services',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-users"></i> Issued Keys</h4><h2 style="color:var(--neon)">{{ db.get('keys',{})|length }}</h2></div>
-            <div class="card glass"><h4><i class="fa-solid fa-bolt"></i> Logs Triggered</h4><h2 style="color:var(--neon)">{{ db.get('logs',[])|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-building"></i> Partners</h4><h2 style="color:var(--neon)">{{ db.get('companies',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-network-wired"></i> Gateways</h4><h2 style="color:var(--neon)">{{ db.get('services',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-users"></i> Issued Keys</h4><h2 style="color:var(--neon)">{{ db.get('keys',{})|length }}</h2></div>
+# [Naked CSS Nuked]             <div class="card glass"><h4><i class="fa-solid fa-bolt"></i> Logs Triggered</h4><h2 style="color:var(--neon)">{{ db.get('logs',[])|length }}</h2></div>
         </div>
-        <h3 style="margin-top:20px;margin-bottom:15px;color:var(--neon-dim)"><i class="fa-solid fa-heart-pulse"></i> Service Health Monitor</h3>
+# [Naked CSS Nuked]         <h3 style="margin-top:20px;margin-bottom:15px;color:var(--neon-dim)"><i class="fa-solid fa-heart-pulse"></i> Service Health Monitor</h3>
         <div class="grid-4">
             {% for code, srv in db.get('services', {}).items() %}
             <div class="card glass" style="border-left:4px solid {% if srv.health_status %}#5cb85c{% else %}#d9534f{% endif %};">
-                <h4 style="margin:0;">{{ srv.name }} <span class="health-dot {% if srv.health_status %}green{% else %}red{% endif %}" style="float:right"></span></h4>
+# [Naked CSS Nuked]                 <h4 style="margin:0;">{{ srv.name }} <span class="health-dot {% if srv.health_status %}green{% else %}red{% endif %}" style="float:right"></span></h4>
                 <p style="font-size:11px;opacity:0.6;margin-top:8px;">Pinged: {{ fmt_time(srv.health_last_check) }}</p>
             </div>
             {% endfor %}
@@ -1027,7 +1027,7 @@ input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102
 # --- HTML TEMPLATE (PART 13: Management Tabs & Modals) ---
 HTML += '''
     <div id="comps" class="tab">
-        <h3 style="color:var(--neon)">Company Management</h3>
+# [Naked CSS Nuked]         <h3 style="color:var(--neon)">Company Management</h3>
         <div style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="card glass" style="flex:1;min-width:250px;">
                 <h4>Add New Company</h4>
@@ -1046,7 +1046,7 @@ HTML += '''
                     {% for c_id, c in db.get('companies', {}).items() %}
                     <tr><td>{{ c_id }}</td><td>{{ c.name }}</td><td>{{ c.tenant }} / {{ c.broker }}</td>
                         <td><span class="health-dot {% if c.active %}green{% else %}red{% endif %}"></span></td>
-                        <td><a href="/admin/company/delete/{{ c_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
+# [Naked CSS Nuked]                         <td><a href="/admin/company/delete/{{ c_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
                     {% endfor %}
                 </table>
             </div>
@@ -1055,7 +1055,7 @@ HTML += '''
 
     <div id="srvs" class="tab">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="color:var(--neon)">Dynamic Services</h3>
+# [Naked CSS Nuked]             <h3 style="color:var(--neon)">Dynamic Services</h3>
             <button class="btn" onclick="document.getElementById('curlModal').style.display='flex'"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Catcher (cURL)</button>
         </div>
         <div class="card glass" style="margin-top:15px;overflow-x:auto;">
@@ -1064,15 +1064,15 @@ HTML += '''
                 {% for s_id, s in db.get('services', {}).items() %}
                 <tr><td>{{ s_id }}</td><td>{{ s.name }} ({{ s.company }})</td>
                     <td><span style="font-size:11px;opacity:0.8">{{ s.method }}</span> {{ s.endpoint }}</td>
-                    <td>{% if s.auth_token %}<span style="color:var(--neon)"><i class="fa-solid fa-lock"></i> Encrypted</span>{% else %}None{% endif %}</td>
-                    <td><a href="/admin/service/delete/{{ s_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
+# [Naked CSS Nuked]                     <td>{% if s.auth_token %}<span style="color:var(--neon)"><i class="fa-solid fa-lock"></i> Encrypted</span>{% else %}None{% endif %}</td>
+# [Naked CSS Nuked]                     <td><a href="/admin/service/delete/{{ s_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
                 {% endfor %}
             </table>
         </div>
     </div>
 
     <div id="keys" class="tab">
-        <h3 style="color:var(--neon)">Key Control</h3>
+# [Naked CSS Nuked]         <h3 style="color:var(--neon)">Key Control</h3>
         <div style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="card glass" style="flex:1;min-width:250px;">
                 <h4>Generate Key</h4>
@@ -1081,7 +1081,7 @@ HTML += '''
                     <input type="number" name="days" placeholder="Validity (Days)" value="30" required>
                     <input type="number" name="limit" placeholder="Max Hits (0=Unlimited)" value="1000" required>
                     <label style="display:block;margin-bottom:5px;font-size:13px;">Assign Services:</label>
-                    <div style="max-height:100px;overflow-y:auto;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;margin-bottom:15px;">
+# [Naked CSS Nuked]                     <div style="max-height:100px;overflow-y:auto;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;margin-bottom:15px;">
                         {% for s_id, s in db.get('services', {}).items() %}<label style="display:block;font-size:12px;"><input type="checkbox" name="assigned_services" value="{{ s_id }}"> {{ s.name }}</label>{% endfor %}
                     </div>
                     <button class="btn" style="width:100%;">Create Key</button>
@@ -1091,14 +1091,14 @@ HTML += '''
                 <table class="table">
                     <tr><th>Key</th><th>Owner</th><th>Usage (Hit/Limit)</th><th>Status</th><th>Actions</th></tr>
                     {% for k_id, k in db.get('keys', {}).items() %}
-                    <tr><td style="font-family:monospace;color:var(--neon);font-size:13px;">{{ k_id }}<br><span style="font-size:10px;color:#aaa;">Exp: {{ fmt_time(k.expiry) }}</span></td>
+# [Naked CSS Nuked]                     <tr><td style="font-family:monospace;color:var(--neon);font-size:13px;">{{ k_id }}<br><span style="font-size:10px;color:#aaa;">Exp: {{ fmt_time(k.expiry) }}</span></td>
                         <td>{{ k.owner }}</td>
                         <td><div style="font-size:11px;margin-bottom:2px;">{{ k.used }} / {% if k.limit==0 %}∞{% else %}{{ k.limit }}{% endif %} (S:{{k.ok}} F:{{k.fail}})</div>
-                            {% if k.limit > 0 %}<div style="width:100%;background:rgba(255,255,255,0.1);height:4px;border-radius:2px;"><div style="width:{{ (k.used/k.limit*100)|round }}%;background:var(--neon);height:100%;border-radius:2px;max-width:100%;"></div></div>{% endif %}
+# [Naked CSS Nuked]                             {% if k.limit > 0 %}<div style="width:100%;background:rgba(255,255,255,0.1);height:4px;border-radius:2px;"><div style="width:{{ (k.used/k.limit*100)|round }}%;background:var(--neon);height:100%;border-radius:2px;max-width:100%;"></div></div>{% endif %}
                         </td>
-                        <td>{% if k.revoked %}<span style="color:#d9534f;font-weight:bold;font-size:12px;">REVOKED</span>{% elif k.expiry < now_ts() %}<span style="color:#f0ad4e;font-weight:bold;font-size:12px;">EXPIRED</span>{% else %}<span style="color:#5cb85c;font-weight:bold;font-size:12px;">ACTIVE</span>{% endif %}</td>
-                        <td><a href="/admin/key/toggle/{{ k_id }}" class="btn" style="padding:4px 8px;font-size:12px;">{% if k.revoked %}Undo{% else %}Revoke{% endif %}</a>
-                            <a href="/admin/key/delete/{{ k_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
+# [Naked CSS Nuked]                         <td>{% if k.revoked %}<span style="color:#d9534f;font-weight:bold;font-size:12px;">REVOKED</span>{% elif k.expiry < now_ts() %}<span style="color:#f0ad4e;font-weight:bold;font-size:12px;">EXPIRED</span>{% else %}<span style="color:#5cb85c;font-weight:bold;font-size:12px;">ACTIVE</span>{% endif %}</td>
+# [Naked CSS Nuked]                         <td><a href="/admin/key/toggle/{{ k_id }}" class="btn" style="padding:4px 8px;font-size:12px;">{% if k.revoked %}Undo{% else %}Revoke{% endif %}</a>
+# [Naked CSS Nuked]                             <a href="/admin/key/delete/{{ k_id }}" class="btn btn-danger" style="padding:4px 8px;font-size:12px;">Del</a></td></tr>
                     {% endfor %}
                 </table>
             </div>
@@ -1108,8 +1108,8 @@ HTML += '''
     <!-- cURL Modal -->
     <div id="curlModal" class="modal">
         <div class="card glass" style="width:500px;position:relative;">
-            <button onclick="document.getElementById('curlModal').style.display='none'" style="position:absolute;top:15px;right:15px;background:none;border:none;color:#fff;cursor:pointer;font-size:20px;">&times;</button>
-            <h3 style="margin-top:0;color:var(--neon)"><i class="fa-solid fa-code"></i> Smart Auto-Catcher</h3>
+# [Naked CSS Nuked]             <button onclick="document.getElementById('curlModal').style.display='none'" style="position:absolute;top:15px;right:15px;background:none;border:none;color:#fff;cursor:pointer;font-size:20px;">&times;</button>
+# [Naked CSS Nuked]             <h3 style="margin-top:0;color:var(--neon)"><i class="fa-solid fa-code"></i> Smart Auto-Catcher</h3>
             <p style="font-size:12px;opacity:0.8;margin-bottom:15px;">Paste cURL. Headers, token, body, and endpoints will be auto-extracted.</p>
             <textarea id="curlInput" rows="7" placeholder="curl -X POST https://api... -H 'Authorization: Bearer xyz' -d '{...}'"></textarea>
             <button class="btn" style="width:100%;" onclick="processCurl()">Parse & Create Service</button>
@@ -1118,12 +1118,12 @@ HTML += '''
 '''
 
     <div id="logs" class="tab">
-        <h3 style="color:var(--neon)">Live Audit Logs</h3>
+# [Naked CSS Nuked]         <h3 style="color:var(--neon)">Live Audit Logs</h3>
         <div class="card glass" style="max-height:400px;overflow-y:auto;">
             <table class="table">
                 <tr><th>Time</th><th>Key</th><th>Service</th><th>Status</th><th>Message</th></tr>
                 {% for log in db.get('logs', [])|reverse %}
-                <tr><td>{{ fmt_time(log.ts) }}</td><td style="font-family:monospace;color:var(--neon)">{{ log.key }}</td>
+# [Naked CSS Nuked]                 <tr><td>{{ fmt_time(log.ts) }}</td><td style="font-family:monospace;color:var(--neon)">{{ log.key }}</td>
                     <td>{{ log.service }}</td><td><span class="health-dot {% if log.ok %}green{% else %}red{% endif %}"></span></td>
                     <td style="font-size:12px;opacity:0.8">{{ log.msg }}</td></tr>
                 {% endfor %}
