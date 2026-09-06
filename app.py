@@ -1,13 +1,13 @@
-import os, json, time, requests, secrets, re
+import os, json, time, requests, secrets, re, bcrypt
 from flask import Flask, request, jsonify, render_template_string, session, redirect, flash, Response
 from cryptography.fernet import Fernet
 from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(16))
 
 # --- ENCRYPTION SETUP ---
-# Master key for encrypting auth tokens (Hinglish: Tokens ko safe rakhne ke liye)
 MASTER_KEY = os.environ.get("ENCRYPT_KEY", Fernet.generate_key().decode())
 cipher = Fernet(MASTER_KEY.encode())
 
@@ -34,6 +34,403 @@ DEFAULT_DB = {
 
 class GistDB:
     _cache, _ts = None, 0
+    @classmethod
+    def load(cls):
+        if cls._cache and (time.time() - cls._ts < 5): return cls._cache
+        try:
+            r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
+            if r.status_code == 200:
+                cls._cache = json.loads(r.json()['files']['db.json']['content'])
+                cls._ts = time.time()
+                with open(BACKUP_FILE, 'w') as f: json.dump(cls._cache, f)
+                return cls._cache
+        except Exception: pass
+        
+        try:
+            with open(BACKUP_FILE, 'r') as f: return json.load(f)
+        except: return dict(DEFAULT_DB)
+
+    @classmethod
+    def save(cls, data):
+        cls._cache, cls._ts = data, time.time()
+        with open(BACKUP_FILE, 'w') as f: json.dump(data, f)
+        try:
+            requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
+                           json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
+        except Exception: pass
+
+# --- HELPER FUNCTIONS ---
+def enc_token(txt): 
+    return cipher.encrypt(txt.encode()).decode() if txt else ""
+    
+def dec_token(txt): 
+    try: return cipher.decrypt(txt.encode()).decode() if txt else ""
+    except: return ""
+
+def now_ts(): return int(time.time())
+def fmt_time(ts): return datetime.fromtimestamp(ts).strftime('%d %b %Y %H:%M:%S')
+
+# --- RATE LIMITER ---
+_limits = {} 
+def is_rate_limited(ident, max_req=60, window=60):
+    now = time.time()
+    reqs = [t for t in _limits.get(ident, []) if now - t < window]
+    if len(reqs) >= max_req: return True
+    reqs.append(now)
+    _limits[ident] = reqs
+    return False
+
+# --- AUTH DECORATOR ---
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged'): 
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['POST'])
+def login():
+    db = GistDB.load()
+    u, p = request.form.get('u',''), request.form.get('p','')
+    db_p = db.get('admin_p', 'admin')
+    valid = bcrypt.checkpw(p.encode(), db_p.encode()) if db_p.startswith('$2') else (p == db_p)
+    
+    if u == db.get('admin_u', 'admin') and valid:
+        session['admin_logged'] = True
+        session.permanent = True
+        app.permanent_session_lifetime = 7200
+    else:
+        flash("Invalid Credentials!")
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+
+# --- COMPANY CRUD ---
+def add_company(code, name, tenant, broker, active=True):
+    db = GistDB.load()
+    db.setdefault('companies', {})
+    if code in db['companies']: return False
+    db['companies'][code] = {"name": name, "tenant": tenant, "broker": broker, "active": bool(active)}
+    GistDB.save(db)
+    return True
+
+def delete_company(code):
+    db = GistDB.load()
+    if code in db.get('companies', {}):
+        del db['companies'][code]
+        GistDB.save(db)
+        return True
+    return False
+
+@app.route('/admin/company/add', methods=['POST'])
+@login_required
+def api_add_company():
+    code, name = request.form.get('code', '').strip(), request.form.get('name', '').strip()
+    if not code or not name:
+        flash("Code and Name required!")
+        return redirect('/')
+    add_company(code, name, request.form.get('tenant', ''), request.form.get('broker', ''), request.form.get('active') == 'on')
+    flash("Company added!")
+    return redirect('/')
+
+@app.route('/admin/company/delete/<code>')
+@login_required
+def api_delete_company(code):
+    delete_company(code)
+    flash("Company deleted.")
+    return redirect('/')
+
+# --- AUTO-CATCHER PARSER ---
+import urllib.parse
+
+def parse_raw_request(raw_text):
+    res = {"method": "GET", "base_url": "", "endpoint": "", "headers": {}, "body_template": {}, "query_params": {}, "auth_token": ""}
+    url_m = re.search(r"(https?://[^\s'\"\\\\]+)", raw_text)
+    if url_m:
+        parsed_u = urllib.parse.urlparse(url_m.group(1))
+        res["base_url"] = f"{parsed_u.scheme}://{parsed_u.netloc}"
+        res["endpoint"] = parsed_u.path
+        res["query_params"] = {k: f"{{{{{k}}}}}" for k, v in urllib.parse.parse_qsl(parsed_u.query)} 
+
+    meth_m = re.search(r"-X\s+([A-Z]+)", raw_text)
+    if meth_m: res["method"] = meth_m.group(1)
+    elif "-d " in raw_text or "--data" in raw_text: res["method"] = "POST"
+
+    for h_m in re.finditer(r"-H\s+['\"]([^'\"]+)['\"]", raw_text):
+        pts = h_m.group(1).split(":", 1)
+        if len(pts) == 2:
+            k, v = pts[0].strip().lower(), pts[1].strip()
+            if k in ['cookie', 'user-agent'] or k.startswith('sec-'): continue
+            if k == 'authorization' and v.lower().startswith('bearer '):
+                res["auth_token"] = enc_token(v[7:].strip())
+                res["headers"][k] = "Bearer {{token}}"
+            else: res["headers"][k] = v
+
+    body_m = re.search(r"(?:--data-raw|-d|--data)\s+['\"](.*?)['\"]", raw_text, re.DOTALL)
+    if body_m:
+        try:
+            b_json = json.loads(body_m.group(1))
+            for k, v in b_json.items():
+                if isinstance(v, (str, int)): b_json[k] = f"{{{{{k}}}}}"
+            res["body_template"] = b_json
+        except: res["body_template"] = body_m.group(1)
+    return res
+
+# --- SERVICE CRUD ---
+def add_service(code, service_data):
+    db = GistDB.load()
+    db.setdefault('services', {})
+    if code in db['services']: return False
+    service_data['health_status'], service_data['health_last_check'] = True, 0
+    if 'auth_token' in service_data and not str(service_data['auth_token']).startswith('gAAAAA'):
+        service_data['auth_token'] = enc_token(service_data['auth_token'])
+    db['services'][code] = service_data
+    GistDB.save(db)
+    return True
+
+def delete_service(code):
+    db = GistDB.load()
+    if code in db.get('services', {}):
+        del db['services'][code]
+        GistDB.save(db)
+        return True
+    return False
+
+@app.route('/admin/service/add', methods=['POST'])
+@login_required
+def api_add_service():
+    code = request.form.get('code', '').strip()
+    data = {
+        "name": request.form.get('name', ''), "company": request.form.get('company', ''),
+        "type": request.form.get('type', 'pan'), "base_url": request.form.get('base_url', ''),
+        "endpoint": request.form.get('endpoint', ''), "method": request.form.get('method', 'POST').upper(),
+        "auth_token": request.form.get('auth_token', ''), "timeout": int(request.form.get('timeout', 10)),
+        "active": request.form.get('active') == 'on'
+    }
+    for field in ['headers', 'body_template', 'query_params']:
+        try: data[field] = json.loads(request.form.get(field, '{}'))
+        except: data[field] = {}
+    add_service(code, data)
+    flash("Service configured!")
+    return redirect('/')
+
+@app.route('/admin/service/delete/<code>')
+@login_required
+def api_delete_service(code):
+    delete_service(code)
+    flash("Service deleted.")
+    return redirect('/')
+
+@app.route('/admin/service/import', methods=['POST'])
+@login_required
+def api_import_service():
+    raw_curl = request.form.get('curl_text', '')
+    if not raw_curl: return jsonify({"status": False, "msg": "Blank request!"})
+    try: return jsonify({"status": True, "data": parse_raw_request(raw_curl)})
+    except Exception as e: return jsonify({"status": False, "msg": str(e)})
+
+# --- KEY CRUD ---
+def generate_key(owner, days, limit, assigned_services):
+    db = GistDB.load()
+    db.setdefault('keys', {})
+    k = f"KEY_{secrets.token_hex(4).upper()}"
+    db['keys'][k] = {
+        'owner': owner, 'expiry': now_ts() + (int(days) * 86400), 'limit': int(limit),
+        'used': 0, 'ok': 0, 'fail': 0, 'revoked': False,
+        'assigned_services': assigned_services if isinstance(assigned_services, list) else [], 'daily_usage': {}
+    }
+    GistDB.save(db)
+    return k
+
+def toggle_key_revoke(key_id):
+    db = GistDB.load()
+    if key_id not in db.get('keys', {}): return False
+    db['keys'][key_id]['revoked'] = not db['keys'][key_id].get('revoked', False)
+    GistDB.save(db)
+    return True
+
+def delete_key(key_id):
+    db = GistDB.load()
+    if key_id in db.get('keys', {}):
+        del db['keys'][key_id]
+        GistDB.save(db)
+        return True
+    return False
+
+@app.route('/admin/key/add', methods=['POST'])
+@login_required
+def api_add_key():
+    generate_key(request.form.get('owner', '').strip(), request.form.get('days', 30), request.form.get('limit', 0), request.form.getlist('assigned_services'))
+    flash("Key generated!")
+    return redirect('/')
+
+@app.route('/admin/key/toggle/<key_id>')
+@login_required
+def api_toggle_key(key_id):
+    toggle_key_revoke(key_id)
+    flash("Key status toggled!")
+    return redirect('/')
+
+@app.route('/admin/key/delete/<key_id>')
+@login_required
+def api_delete_key(key_id):
+    delete_key(key_id)
+    flash("Key deleted!")
+    return redirect('/')
+
+# --- PROXY ENDPOINT ---
+def log_api(db, key, service, ok, msg):
+    db['keys'][key]['used'] = db['keys'][key].get('used', 0) + 1
+    db['keys'][key]['ok' if ok else 'fail'] = db['keys'][key].get('ok' if ok else 'fail', 0) + 1
+    db.setdefault('logs', []).append({"ts": now_ts(), "key": key, "service": service, "ok": ok, "msg": msg})
+    db['logs'] = db['logs'][-500:]
+    GistDB.save(db)
+
+@app.route('/api/verify', methods=['GET', 'POST'])
+def api_verify():
+    db = GistDB.load()
+    k, srv = request.args.get('key'), request.args.get('service')
+    if not k or not srv: return jsonify({"status": False, "msg": "Missing key or service"}), 400
+    
+    if is_rate_limited(request.remote_addr) or is_rate_limited(k):
+        return jsonify({"status": False, "msg": "Rate limit exceeded"}), 429
+        
+    key_obj = db.get('keys', {}).get(k)
+    if not key_obj or key_obj.get('revoked') or now_ts() > key_obj.get('expiry', 0): 
+        return jsonify({"status": False, "msg": "Invalid/Revoked/Expired Key"}), 403
+    if 0 < key_obj.get('limit', 0) <= key_obj.get('used', 0): 
+        return jsonify({"status": False, "msg": "Quota Exhausted"}), 429
+    if srv not in key_obj.get('assigned_services', []): 
+        return jsonify({"status": False, "msg": "Unauthorized Service"}), 403
+    
+    srv_obj = db.get('services', {}).get(srv)
+    if not srv_obj or not srv_obj.get('active'): return jsonify({"status": False, "msg": "Service Offline"}), 503
+    
+    req_data = request.args.to_dict()
+    if request.is_json: req_data.update(request.json)
+    cmp_obj = db.get('companies', {}).get(srv_obj.get('company', ''))
+    
+    def repl_vars(item):
+        if isinstance(item, str):
+            for p, v in req_data.items(): item = item.replace(f"{{{{{p}}}}}", str(v))
+            if cmp_obj: item = item.replace("{{tenant}}", cmp_obj.get('tenant', ''))
+            return item.replace("{{token}}", dec_token(srv_obj.get('auth_token', '')))
+        elif isinstance(item, dict): return {k: repl_vars(v) for k, v in item.items()}
+        elif isinstance(item, list): return [repl_vars(x) for x in item]
+        return item
+        
+    url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
+    try:
+        r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
+                             json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
+                             timeout=srv_obj.get('timeout', 10))
+        log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
+        try: resp_data = r.json()
+        except: resp_data = r.text
+        return jsonify({"status": r.ok, "data": resp_data, "code": r.status_code})
+    except Exception as e:
+        log_api(db, k, srv, False, f"Error: {str(e)[:50]}")
+        return jsonify({"status": False, "msg": "Upstream timeout/error"}), 502
+
+# --- HEALTH CHECK SCHEDULER ---
+from apscheduler.schedulers.background import BackgroundScheduler
+
+def ping_services():
+    db = GistDB.load()
+    services = db.get('services', {})
+    updated = False
+    now = now_ts()
+    
+    for code, srv in services.items():
+        if not srv.get('active'): continue
+        url = srv.get('base_url', '')
+        if not url: continue
+        try:
+            r = requests.get(url, timeout=5)
+            is_healthy = r.status_code < 500 
+        except Exception:
+            is_healthy = False
+            
+        if srv.get('health_status') != is_healthy or (now - srv.get('health_last_check', 0) > 300):
+            srv['health_status'] = is_healthy
+            srv['health_last_check'] = now
+            updated = True
+    if updated: GistDB.save(db)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=ping_services, trigger="interval", seconds=30)
+scheduler.start()
+
+# --- HTML TEMPLATE ---
+HTML = '''<!DOCTYPE html>
+<html lang="en"><head><title>Solo Proxy Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#0b0c10;--glass:rgba(31,40,51,0.6);--border:rgba(69,162,158,0.3);--neon:#66fcf1;--neon-dim:#45a29e;}
+body{background:var(--bg);color:#c5c6c7;font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;}
+::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
+.glass{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+.sidebar{width:260px;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
+.logo{font-size:24px;color:var(--neon);text-shadow:0 0 10px var(--neon);margin-bottom:20px;font-weight:bold;text-align:center;}
+.nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
+.nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
+.main{flex:1;padding:25px;overflow-y:auto;position:relative;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
+.clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
+.card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
+.tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
+.green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
+@keyframes pulse{0%{transform:scale(0.95);opacity:0.8}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0.95);opacity:0.8}}
+.table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;} .table th,.table td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);}
+.btn{padding:8px 15px;border:none;border-radius:6px;cursor:pointer;color:#0b0c10;font-weight:bold;background:var(--neon);transition:0.3s;text-decoration:none;display:inline-block;}
+.btn:hover{box-shadow:0 0 12px var(--neon);} .btn-danger{background:rgba(217,83,79,0.2);color:#d9534f;border:1px solid #d9534f;} .btn-danger:hover{box-shadow:0 0 12px #d9534f;background:#d9534f;color:#fff;}
+input, select, textarea{width:100%;padding:10px;margin:8px 0 15px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:#fff;border-radius:6px;outline:none;}
+input:focus, textarea:focus{border-color:var(--neon);box-shadow:0 0 8px rgba(102,252,241,0.4);}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99;justify-content:center;align-items:center;}
+</style></head><body>
+{% if not session.admin_logged %}
+<div style="margin:auto;width:350px;text-align:center;" class="glass card">
+    <div class="logo"><i class="fa-solid fa-lock"></i> SYSTEM ADMIN</div>
+    <form action="/login" method="POST">
+        <input name="u" placeholder="Admin Username" required>
+        <input type="password" name="p" placeholder="Master Password" required>
+        <button class="btn" style="width:100%;">AUTHENTICATE</button>
+    </form>
+</div>
+{% else %}
+<div class="sidebar glass">
+    <div class="logo"><i class="fa-solid fa-microchip"></i> API CORE</div>
+    <div class="nav-item active" onclick="showTab('dash', this)"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
+    <div class="nav-item" onclick="showTab('comps', this)"><i class="fa-solid fa-building"></i> Companies</div>
+    <div class="nav-item" onclick="showTab('srvs', this)"><i class="fa-solid fa-satellite-dish"></i> Services</div>
+    <div class="nav-item" onclick="showTab('keys', this)"><i class="fa-solid fa-key"></i> Key Manager</div>
+    <div class="nav-item" onclick="showTab('logs', this)"><i class="fa-solid fa-terminal"></i> Live Audit</div>
+    <a href="/logout" class="nav-item" style="color:#d9534f;margin-top:auto;"><i class="fa-solid fa-power-off"></i> Disconnect</a>
+</div>
+<div class="main">
+    <div class="topbar">
+        <h2 id="page-title">Dashboard Overview</h2>
+        <div class="clock" id="live-clock">--:--:--</div>
+    </div>
+    
+    <div id="dash" class="tab active">
+        <div class="grid-4">
+            <div class="card glass"><h4><i class="fa-solid fa-building"></i> Partners</h4><h2 style="color:var(--neon)">{{ db.get('companies',{})|length }}</h2></div>
+            <div class="card glass"><h4><i class="fa-solid fa-network-wired"></i> Gateways</h4><h2 style="color:var(--neon)">{{ db.get('services',{})|length }}</h2></div>
+            <div class="card glass"><h4><i class="fa-solid fa-users"></i> Issued Keys</h4><h2 style="color:var(--neon)">{{ db.get('keys',{})|length }}</h2></div>
+            <div class="card glass"><h4><i class="fa-solid fa-bolt"></i> Logs Triggered</h4><h2 style="color:var(--neon)">{{ db.get('logs',[])|length }}</h2></div>
+        </div>
+        <h3 style="margin-top:20px;margin-bottom:15px;color:var(--neon-dim)"><i class="fa-solid fa-heart-pulse"></i> Service Health Monitor</h3>
+        <div class="grid-4">
     @classmethod
     def load(cls):
         # 5 sec ka chota cache taaki GitHub rate limit hit na ho
