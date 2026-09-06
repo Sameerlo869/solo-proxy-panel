@@ -1242,7 +1242,7 @@ async function processCurl() {
 # --- MAIN DASHBOARD ROUTE ---
 @app.route('/')
 def dashboard():
-    db = GistDB.load()
+    db = GistDB.load() or {}
     return render_template_string(HTML, db=db, now_ts=now_ts, fmt_time=fmt_time)
 
 if __name__ == '__main__':
