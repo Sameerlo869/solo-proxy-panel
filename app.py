@@ -217,7 +217,7 @@ def api_add_service():
     }
     for field in ['headers', 'body_template', 'query_params']:
 # [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
-# [Auto-Cleaned CSS]         except: data[field] = {}
+    # [Auto-Cleaned CSS]         except: data[field] = {}
     add_service(code, data)
     flash("Service configured!")
     return redirect('/')
@@ -329,7 +329,7 @@ def api_verify():
         
 # [Auto-Cleaned CSS]     url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
     try:
-# [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
+    # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
 # [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
                              timeout=srv_obj.get('timeout', 10)
 # [Auto-Cleaned CSS]         log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
@@ -413,7 +413,7 @@ HTML = '''<!DOCTYPE html>
         # 5 sec ka chota cache taaki GitHub rate limit hit na ho
         if cls._cache and (time.time() - cls._ts < 5): return cls._cache
         try:
-# [Auto-Cleaned CSS]             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
+    # [Auto-Cleaned CSS]             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
             if r.status_code == 200:
                 cls._cache = json.loads(r.json()['files']['db.json']['content'])
                 cls._ts = time.time()
@@ -430,7 +430,7 @@ HTML = '''<!DOCTYPE html>
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f) # Backup pehle
         try:
-# [Auto-Cleaned CSS]             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
+    # [Auto-Cleaned CSS]             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
 # [Auto-Cleaned CSS]                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
 
@@ -698,7 +698,7 @@ def api_add_service():
     # JSON strings ko dict me convert kar rahe hain UI form se aate waqt
     for field in ['headers', 'body_template', 'query_params']:
 # [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
-# [Auto-Cleaned CSS]         except: data[field] = {}
+    # [Auto-Cleaned CSS]         except: data[field] = {}
         
     if add_service(code, data):
 # [Auto-Cleaned CSS]         flash(f"Service '{code}' configured successfully!")
@@ -900,7 +900,7 @@ def api_verify():
         
 # [Auto-Cleaned CSS]     url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
     try:
-# [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
+    # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
 # [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
                              timeout=srv_obj.get('timeout', 10))
 # [Auto-Cleaned CSS]         log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
