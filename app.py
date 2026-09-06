@@ -16,7 +16,7 @@ cipher = Fernet(MASTER_KEY.encode())
 # --- CREDENTIALS & CONSTANTS ---
 GIST_ID = "39a77b43b3254947743843a91bffec39"
 GIST_TOKEN = "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"
- GIST_URL = f"https://api.github.com/gists/{GIST_ID}"
+GIST_URL = f"https://api.github.com/gists/{GIST_ID}"
 BACKUP_FILE = "backup.json"
 
 DEFAULT_DB = {
