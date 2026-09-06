@@ -41,6 +41,9 @@ class GistDB:
         if cls._cache and (time.time() - cls._ts < 5): return cls._cache
         try:
             pass
+        except Exception:
+            pass
+            pass
 # [Auto-Cleaned CSS]             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
             if r.status_code == 200:
                 cls._cache = json.loads(r.json()['files']['db.json']['content'])
@@ -59,6 +62,9 @@ class GistDB:
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f)
         try:
             pass
+        except Exception:
+            pass
+            pass
 # [Auto-Cleaned CSS]             requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
 # [Auto-Cleaned CSS]                            json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
@@ -69,6 +75,9 @@ def enc_token(txt):
     
 def dec_token(txt): 
     try: return cipher.decrypt(txt.encode()).decode() if txt else ""
+        pass
+    except Exception:
+        pass
         pass
 
 def now_ts(): return int(time.time())
@@ -177,6 +186,9 @@ def parse_raw_request(raw_text):
     body_m = re.search(r"(?:--data-raw|-d|--data)\s+['\"](.*?)['\"]", raw_text, re.DOTALL)
     if body_m:
         try:
+            pass
+        except Exception:
+            pass
             b_json = json.loads(body_m.group(1))
             for k, v in b_json.items():
                 if isinstance(v, (str, int)): b_json[k] = f"{{{{{k}}}}}"
@@ -329,6 +341,9 @@ def api_verify():
         
 # [Auto-Cleaned CSS]     url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
     try:
+        pass
+    except Exception:
+        pass
     # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
 # [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
                              timeout=srv_obj.get('timeout', 10)
@@ -413,6 +428,9 @@ HTML = '''<!DOCTYPE html>
         # 5 sec ka chota cache taaki GitHub rate limit hit na ho
         if cls._cache and (time.time() - cls._ts < 5): return cls._cache
         try:
+            pass
+        except Exception:
+            pass
     # [Auto-Cleaned CSS]             r = requests.get(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"}, timeout=5)
             if r.status_code == 200:
                 cls._cache = json.loads(r.json()['files']['db.json']['content'])
@@ -616,6 +634,9 @@ def parse_raw_request(raw_text):
     body_m = re.search(r"(?:--data-raw|-d|--data)\s+['\"](.*?)['\"]", raw_text, re.DOTALL)
     if body_m:
         try:
+            pass
+        except Exception:
+            pass
             b_json = json.loads(body_m.group(1))
             for k, v in b_json.items():
                 if isinstance(v, (str, int)): b_json[k] = f"{{{{{k}}}}}"
@@ -900,6 +921,9 @@ def api_verify():
         
 # [Auto-Cleaned CSS]     url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
     try:
+        pass
+    except Exception:
+        pass
     # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
 # [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
                              timeout=srv_obj.get('timeout', 10))
@@ -929,6 +953,9 @@ def ping_services():
         if not url: continue
         
         try:
+            pass
+        except Exception:
+            pass
             # Sirf base_url pe lightweight GET request (5 sec timeout) taaki thread hang na ho
             r = requests.get(url, timeout=5)
             # Agar 500+ status code aaya matlab upstream server crash hai
