@@ -74,11 +74,10 @@ def enc_token(txt):
     return cipher.encrypt(txt.encode()).decode() if txt else ""
     
 def dec_token(txt): 
-    try: return cipher.decrypt(txt.encode()).decode() if txt else ""
-        pass
+    try:
+        return cipher.decrypt(txt.encode()).decode() if txt else ""
     except Exception:
-        pass
-        pass
+        return ""
 
 def now_ts(): return int(time.time())
 def fmt_time(ts): return datetime.fromtimestamp(ts).strftime('%d %b %Y %H:%M:%S')
@@ -228,10 +227,10 @@ def api_add_service():
         "active": request.form.get('active') == 'on'
     }
     for field in ['headers', 'body_template', 'query_params']:
-# [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
-    # [Auto-Cleaned CSS]         except: data[field] = {}
-except Exception:
-    pass
+        try:
+            data[field] = json.loads(request.form.get(field, '{}'))
+        except Exception:
+            data[field] = {}
     add_service(code, data)
     flash("Service configured!")
     return redirect('/')
@@ -346,15 +345,20 @@ def api_verify():
         pass
     except Exception:
         pass
-    # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
-# [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
-                             timeout=srv_obj.get('timeout', 10)
-# [Auto-Cleaned CSS]         log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
+        r = requests.request(
+            srv_obj['method'],
+            url,
+            headers=repl_vars(srv_obj.get('headers', {})),
+            json=repl_vars(srv_obj.get('body_template', {})),
+            params=repl_vars(srv_obj.get('query_params', {})),
+            timeout=srv_obj.get('timeout', 10)
+        )
+        log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
         try: resp_data = r.json()
         except: resp_data = r.text
         return jsonify({"status": r.ok, "data": resp_data, "code": r.status_code})
     except Exception as e:
-# [Auto-Cleaned CSS]         log_api(db, k, srv, False, f"Error: {str(e)[:50]}")
+        log_api(db, k, srv, False, f"Error: {str(e)[:50]}")
         return jsonify({"status": False, "msg": "Upstream timeout/error"}), 502
 
 
@@ -460,9 +464,10 @@ def enc_token(txt):
     return cipher.encrypt(txt.encode()).decode() if txt else ""
     
 def dec_token(txt): 
-    # Encrypted token ko wapas decrypt karne ke liye
-    try: return cipher.decrypt(txt.encode()).decode() if txt else ""
-    except: return ""
+    try:
+        return cipher.decrypt(txt.encode()).decode() if txt else ""
+    except Exception:
+        return ""
 
 def now_ts(): return int(time.time())
 def fmt_time(ts): return datetime.fromtimestamp(ts).strftime('%d %b %Y %H:%M:%S')
@@ -720,11 +725,10 @@ def api_add_service():
     
     # JSON strings ko dict me convert kar rahe hain UI form se aate waqt
     for field in ['headers', 'body_template', 'query_params']:
-# [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
-    # [Auto-Cleaned CSS]         except: data[field] = {}
-except Exception:
-    pass
-        
+        try:
+            data[field] = json.loads(request.form.get(field, '{}'))
+        except Exception:
+            data[field] = {}
     if add_service(code, data):
 # [Auto-Cleaned CSS]         flash(f"Service '{code}' configured successfully!")
     else:
@@ -981,6 +985,7 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=ping_services, trigger="interval", seconds=30)
 scheduler.start()
 
+'''
 # --- HTML TEMPLATE (PART 12: Base UI & Dashboard) ---
 HTML = '''<!DOCTYPE html>
 <html lang="en"><head><title>Solo Proxy Panel</title>
@@ -1126,7 +1131,7 @@ HTML += '''
                     {% for k_id, k in db.get('keys', {}).items() %}
 # [Auto-Cleaned CSS] # [Naked CSS Nuked]                     <tr><td style="font-family:monospace;color:var(--neon);font-size:13px;">{{ k_id }}<br><span style="font-size:10px;color:#aaa;">Exp: {{ fmt_time(k.expiry) }}</span></td>
 # [Auto-Cleaned CSS]                         <td>{{ k.owner }}</td>
-                        <td><div style="font-size:11px;margin-bottom:2px;">{{ k.used }} / {% if k.limit==0 %}∞{% else %}{{ k.limit }}{% endif %} (S:{{k.ok}} F:{{k.fail}})</div>
+                        <td><div style="font-size:11px;margin-bottom:2px;">{{ k.used }} / {% if k.limit==0 %}&infin;{% else %}{{ k.limit }}{% endif %} (S:{{k.ok}} F:{{k.fail}})</div>
 # [Naked CSS Nuked]                             {% if k.limit > 0 %}<div style="width:100%;background:rgba(255,255,255,0.1);height:4px;border-radius:2px;"><div style="width:{{ (k.used/k.limit*100)|round }}%;background:var(--neon);height:100%;border-radius:2px;max-width:100%;"></div></div>{% endif %}
                         </td>
 # [Naked CSS Nuked]                         <td>{% if k.revoked %}<span style="color:#d9534f;font-weight:bold;font-size:12px;">REVOKED</span>{% elif k.expiry < now_ts() %}<span style="color:#f0ad4e;font-weight:bold;font-size:12px;">EXPIRED</span>{% else %}<span style="color:#5cb85c;font-weight:bold;font-size:12px;">ACTIVE</span>{% endif %}</td>
@@ -1148,9 +1153,8 @@ HTML += '''
             <button class="btn" style="width:100%;" onclick="processCurl()">Parse & Create Service</button>
         </div>
     </div>
-'''
 
-    <div id="logs" class="tab">
+<div id="logs" class="tab">
 # [Naked CSS Nuked]         <h3 style="color:var(--neon)">Live Audit Logs</h3>
         <div class="card glass" style="max-height:400px;overflow-y:auto;">
             <table class="table">
