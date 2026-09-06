@@ -356,11 +356,11 @@ HTML = '''<!DOCTYPE html>
 # [Naked CSS Nuked] .nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
 # [Naked CSS Nuked] .nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
 # [Naked CSS Nuked] .main{flex:1;padding:25px;overflow-y:auto;position:relative;}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
+# [Cleaned CSS] .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
 # [Naked CSS Nuked] .clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
-.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
+# [Cleaned CSS] .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
 # [Naked CSS Nuked] .card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
-.tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
+# [Cleaned CSS] .tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
 @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 # [Naked CSS Nuked] .health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
 # [Naked CSS Nuked] .green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
@@ -964,11 +964,11 @@ HTML = '''<!DOCTYPE html>
 # [Naked CSS Nuked] .nav-item{padding:12px 15px;cursor:pointer;border-radius:8px;transition:0.3s;display:flex;align-items:center;gap:12px;}
 # [Naked CSS Nuked] .nav-item:hover, .nav-item.active{background:rgba(102,252,241,0.1);color:var(--neon);box-shadow:inset 4px 0 0 var(--neon);}
 # [Naked CSS Nuked] .main{flex:1;padding:25px;overflow-y:auto;position:relative;}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
+# [Cleaned CSS] .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border);}
 # [Naked CSS Nuked] .clock{font-size:18px;color:var(--neon);text-shadow:0 0 5px var(--neon);letter-spacing:1px;font-family:monospace;}
-.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
+# [Cleaned CSS] .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
 # [Naked CSS Nuked] .card{padding:20px;transition:0.3s;} .card:hover{transform:translateY(-3px);box-shadow:0 0 15px rgba(102,252,241,0.2);border-color:var(--neon-dim);}
-.tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
+# [Cleaned CSS] .tab{display:none;animation:fade 0.4s;} .tab.active{display:block;}
 @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 # [Naked CSS Nuked] .health-dot{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
 # [Naked CSS Nuked] .green{background:#5cb85c;box-shadow:0 0 10px #5cb85c;} .red{background:#d9534f;box-shadow:0 0 10px #d9534f;}
@@ -1028,7 +1028,7 @@ HTML = '''<!DOCTYPE html>
 HTML += '''
     <div id="comps" class="tab">
 # [Naked CSS Nuked]         <h3 style="color:var(--neon)">Company Management</h3>
-        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+# [Cleaned CSS]         <div style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="card glass" style="flex:1;min-width:250px;">
                 <h4>Add New Company</h4>
                 <form action="/admin/company/add" method="POST">
@@ -1054,7 +1054,7 @@ HTML += '''
     </div>
 
     <div id="srvs" class="tab">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+# [Cleaned CSS]         <div style="display:flex;justify-content:space-between;align-items:center;">
 # [Naked CSS Nuked]             <h3 style="color:var(--neon)">Dynamic Services</h3>
             <button class="btn" onclick="document.getElementById('curlModal').style.display='flex'"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Catcher (cURL)</button>
         </div>
@@ -1073,16 +1073,16 @@ HTML += '''
 
     <div id="keys" class="tab">
 # [Naked CSS Nuked]         <h3 style="color:var(--neon)">Key Control</h3>
-        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+# [Cleaned CSS]         <div style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="card glass" style="flex:1;min-width:250px;">
                 <h4>Generate Key</h4>
                 <form action="/admin/key/add" method="POST">
                     <input name="owner" placeholder="Client Name" required>
                     <input type="number" name="days" placeholder="Validity (Days)" value="30" required>
                     <input type="number" name="limit" placeholder="Max Hits (0=Unlimited)" value="1000" required>
-                    <label style="display:block;margin-bottom:5px;font-size:13px;">Assign Services:</label>
+# [Cleaned CSS]                     <label style="display:block;margin-bottom:5px;font-size:13px;">Assign Services:</label>
 # [Naked CSS Nuked]                     <div style="max-height:100px;overflow-y:auto;background:rgba(0,0,0,0.3);padding:10px;border-radius:6px;margin-bottom:15px;">
-                        {% for s_id, s in db.get('services', {}).items() %}<label style="display:block;font-size:12px;"><input type="checkbox" name="assigned_services" value="{{ s_id }}"> {{ s.name }}</label>{% endfor %}
+# [Cleaned CSS]                         {% for s_id, s in db.get('services', {}).items() %}<label style="display:block;font-size:12px;"><input type="checkbox" name="assigned_services" value="{{ s_id }}"> {{ s.name }}</label>{% endfor %}
                     </div>
                     <button class="btn" style="width:100%;">Create Key</button>
                 </form>
