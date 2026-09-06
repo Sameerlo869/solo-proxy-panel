@@ -338,34 +338,7 @@ def api_verify():
         log_api(db, k, srv, False, f"Error: {str(e)[:50]}")
         return jsonify({"status": False, "msg": "Upstream timeout/error"}), 502
 
-# --- HEALTH CHECK SCHEDULER ---
-from apscheduler.schedulers.background import BackgroundScheduler
 
-def ping_services():
-    db = GistDB.load()
-    services = db.get('services', {})
-    updated = False
-    now = now_ts()
-    
-    for code, srv in services.items():
-        if not srv.get('active'): continue
-        url = srv.get('base_url', '')
-        if not url: continue
-        try:
-            r = requests.get(url, timeout=5)
-            is_healthy = r.status_code < 500 
-        except Exception:
-            is_healthy = False
-            
-        if srv.get('health_status') != is_healthy or (now - srv.get('health_last_check', 0) > 300):
-            srv['health_status'] = is_healthy
-            srv['health_last_check'] = now
-            updated = True
-    if updated: GistDB.save(db)
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=ping_services, trigger="interval", seconds=30)
-scheduler.start()
 
 # --- HTML TEMPLATE ---
 HTML = '''<!DOCTYPE html>
