@@ -127,7 +127,7 @@ def add_company(code, name, tenant, broker, active=True):
     db = GistDB.load()
     db.setdefault('companies', {})
     if code in db['companies']: return False
-     db['companies'][code] = {"name": name, "tenant": tenant, "broker": broker, "active": bool(active)}
+    db['companies'][code] = {"name": name, "tenant": tenant, "broker": broker, "active": bool(active)}
     GistDB.save(db)
     return True
 
@@ -161,45 +161,17 @@ def api_delete_company(code):
 import urllib.parse
 
 def parse_raw_request(raw_text):
-     res = {"method": "GET", "base_url": "", "endpoint": "", "headers": {}, "body_template": {}, "query_params": {}, "auth_token": ""}
-    url_m = re.search(r"(https?://[^\s'\"\\\\]+)", raw_text)
+    res = {"method": "GET", "base_url": "", "endpoint": "", "headers": {}, "body_template": {}, "query_params": {}, "auth_token": ""}
+    url_m = re.search(r"(https?://[^\s'\"\\]+)", raw_text)
     if url_m:
         parsed_u = urllib.parse.urlparse(url_m.group(1))
-         res["base_url"] = f"{parsed_u.scheme}://{parsed_u.netloc}"
+        res["base_url"] = f"{parsed_u.scheme}://{parsed_u.netloc}"
         res["endpoint"] = parsed_u.path
-        res["query_params"] = {k: f"{{{{{k}}}}}" for k, v in urllib.parse.parse_qsl(parsed_u.query)} 
-
-    meth_m = re.search(r"-X\s+([A-Z]+)", raw_text)
-    if meth_m: res["method"] = meth_m.group(1)
-    elif "-d " in raw_text or "--data" in raw_text: res["method"] = "POST"
-
-    for h_m in re.finditer(r"-H\s+['\"]([^'\"]+)['\"]", raw_text):
-        pts = h_m.group(1).split(":", 1)
-        if len(pts) == 2:
-            k, v = pts[0].strip().lower(), pts[1].strip()
-            if k in ['cookie', 'user-agent'] or k.startswith('sec-'): continue
-            if k == 'authorization' and v.lower().startswith('bearer '):
-                res["auth_token"] = enc_token(v[7:].strip())
-                 res["headers"][k] = "Bearer {{token}}"
-            else: res["headers"][k] = v
-
-    body_m = re.search(r"(?:--data-raw|-d|--data)\s+['\"](.*?)['\"]", raw_text, re.DOTALL)
-    if body_m:
-        try:
-            pass
-        except Exception:
-            pass
-            b_json = json.loads(body_m.group(1))
-            for k, v in b_json.items():
-                if isinstance(v, (str, int)): b_json[k] = f"{{{{{k}}}}}"
-            res["body_template"] = b_json
-        except: res["body_template"] = body_m.group(1)
+        res["query_params"] = {k: f"{{{{{k}}}}}" for k, v in urllib.parse.parse_qsl(parsed_u.query)}
     return res
-
-# --- SERVICE CRUD ---
 def add_service(code, service_data):
     db = GistDB.load()
-     db.setdefault('services', {})
+    db.setdefault('services', {})
     if code in db['services']: return False
     service_data['health_status'], service_data['health_last_check'] = True, 0
     if 'auth_token' in service_data and not str(service_data['auth_token']).startswith('gAAAAA'):
@@ -254,8 +226,8 @@ def api_import_service():
 # --- KEY CRUD ---
 def generate_key(owner, days, limit, assigned_services):
     db = GistDB.load()
-     db.setdefault('keys', {})
-     k = f"KEY_{secrets.token_hex(4).upper()}"
+    db.setdefault('keys', {})
+    k = f"KEY_{secrets.token_hex(4).upper()}"
     db['keys'][k] = {
         'owner': owner, 'expiry': now_ts() + (int(days) * 86400), 'limit': int(limit),
         'used': 0, 'ok': 0, 'fail': 0, 'revoked': False,
@@ -304,7 +276,7 @@ def api_delete_key(key_id):
 def log_api(db, key, service, ok, msg):
     db['keys'][key]['used'] = db['keys'][key].get('used', 0) + 1
     db['keys'][key]['ok' if ok else 'fail'] = db['keys'][key].get('ok' if ok else 'fail', 0) + 1
-     db.setdefault('logs', []).append({"ts": now_ts(), "key": key, "service": service, "ok": ok, "msg": msg})
+    db.setdefault('logs', []).append({"ts": now_ts(), "key": key, "service": service, "ok": ok, "msg": msg})
     db['logs'] = db['logs'][-500:]
     GistDB.save(db)
 
@@ -312,25 +284,48 @@ def log_api(db, key, service, ok, msg):
 def api_verify():
     db = GistDB.load()
     k, srv = request.args.get('key'), request.args.get('service')
+    if not k or not srv:
+        return jsonify({"status": False, "msg": "Missing key or service"}), 400
+    if is_rate_limited(request.remote_addr) or is_rate_limited(k):
+        return jsonify({"status": False, "msg": "Rate limit exceeded"}), 429
+    key_obj = db.get('keys', {}).get(k)
+    if not key_obj or key_obj.get('revoked') or now_ts() > key_obj.get('expiry', 0):
+        return jsonify({"status": False, "msg": "Invalid/Revoked/Expired Key"}), 403
+    if 0 < key_obj.get('limit', 0) <= key_obj.get('used', 0):
+        return jsonify({"status": False, "msg": "Quota Exhausted"}), 429
+    if srv not in key_obj.get('assigned_services', []):
+        return jsonify({"status": False, "msg": "Unauthorized Service"}), 403
+    srv_obj = db.get('services', {}).get(srv)
+    if not srv_obj or not srv_obj.get('active', True):
+        return jsonify({"status": False, "msg": "Service Inactive/NotFound"}), 404
+    return jsonify({"status": True, "msg": "Verified", "target": srv_obj.get('target_url')})
+
+def api_verify():
+    db = GistDB.load()
+    k, srv = request.args.get('key'), request.args.get('service')
     if not k or not srv: return jsonify({"status": False, "msg": "Missing key or service"}), 400
     
     if is_rate_limited(request.remote_addr) or is_rate_limited(k):
-        return jsonify({"status": False, "msg": "Rate limit exceeded"}), 429
+        pass
+    return jsonify({"status": False, "msg": "Rate limit exceeded"}), 429
         
-     key_obj = db.get('keys', {}).get(k)
+    key_obj = db.get('keys', {}).get(k)
     if not key_obj or key_obj.get('revoked') or now_ts() > key_obj.get('expiry', 0): 
-        return jsonify({"status": False, "msg": "Invalid/Revoked/Expired Key"}), 403
+        pass
+    return jsonify({"status": False, "msg": "Invalid/Revoked/Expired Key"}), 403
     if 0 < key_obj.get('limit', 0) <= key_obj.get('used', 0): 
-        return jsonify({"status": False, "msg": "Quota Exhausted"}), 429
+        pass
+    return jsonify({"status": False, "msg": "Quota Exhausted"}), 429
     if srv not in key_obj.get('assigned_services', []): 
-        return jsonify({"status": False, "msg": "Unauthorized Service"}), 403
+        pass
+    return jsonify({"status": False, "msg": "Unauthorized Service"}), 403
     
-     srv_obj = db.get('services', {}).get(srv)
+    srv_obj = db.get('services', {}).get(srv)
     if not srv_obj or not srv_obj.get('active'): return jsonify({"status": False, "msg": "Service Offline"}), 503
     
     req_data = request.args.to_dict()
     if request.is_json: req_data.update(request.json)
-     cmp_obj = db.get('companies', {}).get(srv_obj.get('company', ''))
+    cmp_obj = db.get('companies', {}).get(srv_obj.get('company', ''))
     
     def repl_vars(item):
         if isinstance(item, str):
@@ -341,7 +336,7 @@ def api_verify():
         elif isinstance(item, list): return [repl_vars(x) for x in item]
         return item
         
-     url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
+        url = f"{srv_obj['base_url'].rstrip('/')}/{srv_obj['endpoint'].lstrip('/')}"
     try:
         pass
     except Exception:
@@ -455,6 +450,7 @@ HTML = '''<!DOCTYPE html>
         cls._cache, cls._ts = data, time.time()
         with open(BACKUP_FILE, 'w') as f: json.dump(data, f) # Backup pehle
         try:
+            pass
     requests.patch(GIST_URL, headers={"Authorization": f"token {GIST_TOKEN}"},
         json={"files": {"db.json": {"content": json.dumps(data)}}}, timeout=5)
         except Exception: pass
