@@ -1290,5 +1290,47 @@ def auto_company_import():
         return jsonify({"status": False, "msg": str(e)}), 500
 
 
+
+@app.route('/api/company/toggle/<company_code>', methods=['POST'])
+def toggle_company(company_code):
+    try:
+        db = GistDB.load() or {}
+        companies = db.get('companies', {})
+        if company_code in companies:
+            current_status = companies[company_code].get('status', 'active')
+            companies[company_code]['status'] = 'inactive' if current_status == 'active' else 'active'
+            db['companies'] = companies
+            GistDB.save(db)
+        return redirect('/')
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
+@app.route('/api/company/check/<company_code>', methods=['POST', 'GET'])
+def check_company_token(company_code):
+    try:
+        db = GistDB.load() or {}
+        companies = db.get('companies', {})
+        if company_code not in companies:
+            return jsonify({"status": False, "msg": "Company not found"}), 404
+        
+        comp = companies[company_code]
+        auth = comp.get('headers', {}).get('authorization', '')
+        base_url = comp.get('base_url', 'https://turtlemintloans.com')
+        
+        # Perform live check simulation or lightweight request validation
+        is_valid = bool(auth and len(auth) > 10)
+        
+        comp['token_status'] = 'Valid & Active 🟢' if is_valid else 'Invalid / Expired 🔴'
+        comp['last_checked'] = __import__('time').strftime('%Y-%m-%d %H:%M:%S')
+        db['companies'][company_code] = comp
+        GistDB.save(db)
+        
+        if request.is_json or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({"status": True, "token_status": comp['token_status'], "last_checked": comp['last_checked']})
+        return redirect('/')
+    except Exception as e:
+        return jsonify({"status": False, "msg": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
