@@ -84,7 +84,7 @@ def now_ts(): return int(time.time())
 def fmt_time(ts): return datetime.fromtimestamp(ts).strftime('%d %b %Y %H:%M:%S')
 
 # --- RATE LIMITER ---
- _limits = {} 
+_limits = {} 
 def is_rate_limited(ident, max_req=60, window=60):
     now = time.time()
     reqs = [t for t in _limits.get(ident, []) if now - t < window]
