@@ -104,19 +104,41 @@ def login_required(f):
 
 @app.route('/login', methods=['POST'])
 def login():
-    db = GistDB.load() or {}
-    u, p = request.form.get('u',''), request.form.get('p','')
-    db_p = db.get('admin_p', 'admin')
-    valid = bcrypt.checkpw(p.encode(), db_p.encode()) if db_p.startswith('$2') else (p == db_p)
-    
-    if u == db.get('admin_u', 'admin') and valid:
-        session['admin_logged'] = True
-        session.permanent = True
-        app.permanent_session_lifetime = 7200
-    else:
-        flash("Invalid Credentials!")
-    return redirect('/')
-
+    try:
+        db = {}
+        try:
+            loaded = GistDB.load()
+            if isinstance(loaded, dict):
+                db = loaded
+        except Exception as db_err:
+            print(f"GistDB load fallback active: {db_err}")
+        
+        u = request.form.get('u', '')
+        p = request.form.get('p', '')
+        
+        admin_u = db.get('admin_u', 'admin') if db else 'admin'
+        db_p = db.get('admin_p', 'admin') if db else 'admin'
+        
+        valid = False
+        if db_p and db_p.startswith('$2'):
+            try:
+                valid = bcrypt.checkpw(p.encode(), db_p.encode())
+            except Exception:
+                valid = (p == db_p)
+        else:
+            valid = (p == db_p)
+        
+        if u == admin_u and valid:
+            session['admin_logged'] = True
+            session.permanent = True
+            app.permanent_session_lifetime = 7200
+            return redirect('/')
+        else:
+            return "Invalid username or password! <a href='/'>Go back</a>", 401
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"Login Error: {str(e)}", 500
 @app.route('/logout')
 def logout():
     session.clear()
@@ -494,21 +516,41 @@ def login_required(f):
 
 @app.route('/login', methods=['POST'])
 def login():
-    db = GistDB.load() or {}
-    u, p = request.form.get('u',''), request.form.get('p','')
-    db_p = db.get('admin_p', 'admin')
-    
-    # Bcrypt support with plain-text fallback for initial raw setup
-    valid = bcrypt.checkpw(p.encode(), db_p.encode()) if db_p.startswith('$2') else (p == db_p)
-    
-    if u == db.get('admin_u', 'admin') and valid:
-        session['admin_logged'] = True
-        session.permanent = True
-        app.permanent_session_lifetime = 7200 # 2 ghante ka session timeout
-    else:
-        flash("Invalid Credentials!")
-    return redirect('/')
-
+    try:
+        db = {}
+        try:
+            loaded = GistDB.load()
+            if isinstance(loaded, dict):
+                db = loaded
+        except Exception as db_err:
+            print(f"GistDB load fallback active: {db_err}")
+        
+        u = request.form.get('u', '')
+        p = request.form.get('p', '')
+        
+        admin_u = db.get('admin_u', 'admin') if db else 'admin'
+        db_p = db.get('admin_p', 'admin') if db else 'admin'
+        
+        valid = False
+        if db_p and db_p.startswith('$2'):
+            try:
+                valid = bcrypt.checkpw(p.encode(), db_p.encode())
+            except Exception:
+                valid = (p == db_p)
+        else:
+            valid = (p == db_p)
+        
+        if u == admin_u and valid:
+            session['admin_logged'] = True
+            session.permanent = True
+            app.permanent_session_lifetime = 7200
+            return redirect('/')
+        else:
+            return "Invalid username or password! <a href='/'>Go back</a>", 401
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return f"Login Error: {str(e)}", 500
 @app.route('/logout')
 def logout():
     session.clear()
