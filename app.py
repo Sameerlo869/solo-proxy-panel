@@ -1,4 +1,6 @@
-import os, json, time, requests, secrets, re, bcrypt
+import os, json, time, requests, secrets, re
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, request, jsonify, render_template_string, session, redirect, flash, Response
 from cryptography.fernet import Fernet
 from datetime import datetime
@@ -18,7 +20,7 @@ GIST_URL = f"https://api.github.com/gists/{GIST_ID}"
 BACKUP_FILE = "backup.json"
 
 DEFAULT_DB = {
-    "admin_u": "admin", "admin_p": "admin", 
+    "admin_u": "admin", "admin_p": generate_password_hash("admin"), 
     "companies": {"ramfin": {"name": "RamFincorp", "tenant": "MMMWO", "broker": "ramfin", "active": True}},
     "services": {
         "pan_ramfin": {
@@ -492,7 +494,6 @@ def login_required(f):
     return decorated_function
 
 # --- AUTH ROUTES ---
-import bcrypt
 
 @app.route('/login', methods=['POST'])
 def login():
