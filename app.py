@@ -329,7 +329,7 @@ def api_verify():
     try:
 # [Auto-Cleaned CSS]         r = requests.request(srv_obj['method'], url, headers=repl_vars(srv_obj.get('headers', {})),
 # [Auto-Cleaned CSS]                              json=repl_vars(srv_obj.get('body_template', {})), params=repl_vars(srv_obj.get('query_params', {})), 
-                             timeout=srv_obj.get('timeout', 10))
+                             timeout=srv_obj.get('timeout', 10)
 # [Auto-Cleaned CSS]         log_api(db, k, srv, r.ok, f"Upstream HTTP {r.status_code}")
         try: resp_data = r.json()
         except: resp_data = r.text
