@@ -1251,5 +1251,44 @@ def dashboard():
     db = GistDB.load() or {}
     return render_template_string(HTML, db=db, now_ts=now_ts, fmt_time=fmt_time)
 
+
+@app.route('/api/auto-company-import', methods=['POST'])
+def auto_company_import():
+    try:
+        raw_data = request.form.get('raw_data', '') or (request.json.get('raw_data', '') if request.is_json else '')
+        if not raw_data:
+            return jsonify({"status": False, "msg": "No data provided"}), 400
+        
+        import re
+        tenant_match = re.search(r'x-tenant:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
+        broker_match = re.search(r'x-broker:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
+        provider_match = re.search(r'x-provider:\s*([^\r\n]+)', raw_data, re.IGNORECASE)
+        
+        tenant = tenant_match.group(1).strip() if tenant_match else "default_tenant"
+        broker = broker_match.group(1).strip() if broker_match else "default_broker"
+        provider = provider_match.group(1).strip() if provider_match else "default_provider"
+        
+        db = GistDB.load() or {}
+        if 'companies' not in db:
+            db['companies'] = {}
+            
+        company_code = broker.lower().replace(" ", "_")
+        db['companies'][company_code] = {
+            "code": company_code,
+            "full_name": broker.title() + " Enterprise",
+            "tenant_id": tenant,
+            "broker_id": broker,
+            "active_provider": provider,
+            "raw_snippet": raw_data[:200]
+        }
+        
+        GistDB.save(db)
+        if request.is_json or (request.headers.get('Content-Type') and 'application/json' in request.headers.get('Content-Type')):
+            return jsonify({"status": True, "msg": f"Company {company_code} saved successfully!", "data": db['companies'][company_code]})
+        return redirect('/')
+    except Exception as e:
+        return jsonify({"status": False, "msg": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
