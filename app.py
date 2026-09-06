@@ -230,6 +230,8 @@ def api_add_service():
     for field in ['headers', 'body_template', 'query_params']:
 # [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
     # [Auto-Cleaned CSS]         except: data[field] = {}
+except Exception:
+    pass
     add_service(code, data)
     flash("Service configured!")
     return redirect('/')
@@ -720,6 +722,8 @@ def api_add_service():
     for field in ['headers', 'body_template', 'query_params']:
 # [Auto-Cleaned CSS]         try: data[field] = json.loads(request.form.get(field, '{}'))
     # [Auto-Cleaned CSS]         except: data[field] = {}
+except Exception:
+    pass
         
     if add_service(code, data):
 # [Auto-Cleaned CSS]         flash(f"Service '{code}' configured successfully!")
