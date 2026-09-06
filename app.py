@@ -125,7 +125,7 @@ def logout():
 # --- COMPANY CRUD ---
 def add_company(code, name, tenant, broker, active=True):
     db = GistDB.load()
-     db.setdefault('companies', {})
+    db.setdefault('companies', {})
     if code in db['companies']: return False
      db['companies'][code] = {"name": name, "tenant": tenant, "broker": broker, "active": bool(active)}
     GistDB.save(db)
