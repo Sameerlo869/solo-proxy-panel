@@ -104,7 +104,7 @@ def login_required(f):
 
 @app.route('/login', methods=['POST'])
 def login():
-    db = GistDB.load()
+    db = GistDB.load() or {}
     u, p = request.form.get('u',''), request.form.get('p','')
     db_p = db.get('admin_p', 'admin')
     valid = bcrypt.checkpw(p.encode(), db_p.encode()) if db_p.startswith('$2') else (p == db_p)
@@ -494,7 +494,7 @@ def login_required(f):
 
 @app.route('/login', methods=['POST'])
 def login():
-    db = GistDB.load()
+    db = GistDB.load() or {}
     u, p = request.form.get('u',''), request.form.get('p','')
     db_p = db.get('admin_p', 'admin')
     
